@@ -38,7 +38,7 @@ Estrai dalla seguente scheda tecnica TUTTI i dati caratteristici e restituiscili
 Il JSON deve contenere i campi:
 - title
 - short_description (descrizione breve nello stile seguente):
-  Garanzia 24 mesi Magliozzi
+  Garanzia 24 mesi
   Referenza: prendere referenza presenti nella scheda
   Anno: prendere anno presenti nella scheda
   Corredo: prendere corredo presenti nella scheda
