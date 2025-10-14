@@ -8,7 +8,7 @@ Product GPT Importer è un plugin WordPress pensato per creare prodotti WooComme
 3. **Avvia l'importazione**: il plugin legge i dati della scheda tecnica, interroga l'API OpenAI e genera un prodotto WooCommerce pronto per essere pubblicato.
 
 ## Limitazioni della versione gratuita
-Questa versione ti permette di utilizzare la tua chiave OpenAI per testare il plugin, con alcuni limiti pensati per evitare un uso intensivo:
+Questa versione ti permette di utilizzare la tua chiave OpenAI per utilizzare il plugin, con alcuni limiti pensati per evitare un uso intensivo:
 
 * Massimo **3 richieste** all'ora verso l'API OpenAI.
 * Fino a **2 profili AI salvati** (incluso quello predefinito).
@@ -22,14 +22,10 @@ Ogni profilo AI contiene due parti distinte:
 
 Grazie ai profili puoi adattare l'importazione a diversi cataloghi (gioielli, elettronica, abbigliamento…) salvando per ognuno le regole che preferisci.
 
-### Esempio: profilo “Gioielli e Orologi”
+### Esempio: profilo default “Gioielli e Orologi”
 **System prompt**
 ```
-Questa versione gratuita ti permette di utilizzare la tua chiave OpenAI con alcune limitazioni pensate per testare il plugin.
-
-Massimo 3 richieste all'ora verso l'API.
-Fino a 2 profili AI salvati (incluso quello predefinito).
-Colori personalizzati, multiprodotto e anteprima batch riservati alla versione Premium.
+Sei un assistente per e-commerce di orologi e gioielli. Rispondi sempre in formato JSON.
 ```
 
 **Prompt utente**
@@ -38,7 +34,7 @@ Estrai dalla seguente scheda tecnica TUTTI i dati caratteristici e restituiscili
 Il JSON deve contenere i campi:
 - title
 - short_description (descrizione breve nello stile seguente):
-  Garanzia 24 mesi Magliozzi
+  Garanzia 24 mesi
   Referenza: prendere referenza presenti nella scheda
   Anno: prendere anno presenti nella scheda
   Corredo: prendere corredo presenti nella scheda
