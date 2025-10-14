@@ -1,9 +1,14 @@
 <?php
+
 /**
- * Plugin Name: Product GPT Importer
- * Description: Crea prodotti WooCommerce utilizzando ChatGPT partendo da file di scheda tecnica o da una pagina web esterna.
- * Version: 1.3.0
+ * Plugin Name: Product GPT Importer Free
+ * Description: Crea prodotti WooCommerce utilizzando ChatGPT partendo da file di scheda tecnica o da una pagina web esterna. Import base (versione gratuita). Funzioni avanzate nel Pro.
+ * Version: 1.0.0
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
  * Author: Vittorio Russo
+ * License: GPLv2 or later
+ * Text Domain: product-gpt-importer
  */
 
 if (!defined('ABSPATH')) exit;
