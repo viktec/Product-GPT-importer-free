@@ -1,15 +1,15 @@
 <?php
 
-// Loggare richieste e risposte
+// Log requests and responses
 if (!function_exists('product_gpt_log_event')) {
 function product_gpt_log_event($request, $response) {
     if (!get_option('product_gpt_debug')) return;
 
-    // Converte tutto in JSON safe e limita la lunghezza per sicurezza
+    // Convert everything into JSON-safe strings and limit their length for safety
     $safe_request  = json_encode($request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
     $safe_response = json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
 
-    // Limita la lunghezza a 10.000 caratteri (personalizza a piacere)
+    // Limit the length to 10,000 characters (adjust if needed)
     $max_length = 10000;
     if ($safe_request && strlen($safe_request) > $max_length) {
         $safe_request = substr($safe_request, 0, $max_length) . '... [troncato]';
@@ -25,21 +25,21 @@ function product_gpt_log_event($request, $response) {
         'response' => $safe_response
     ];
 
-    // Mantieni solo gli ultimi 50 log
+    // Keep only the 50 most recent log entries
     $logs = array_slice($logs, -50);
 
     update_option('product_gpt_logs', $logs);
 }
 }
 
-// Ottenere i log 
+// Retrieve logs
 if (!function_exists('product_gpt_get_logs')) {
 function product_gpt_get_logs() {
     return array_reverse(get_option('product_gpt_logs', []));
 }
 }
 
-// Pulire i log
+// Clear logs
 if (!function_exists('product_gpt_clear_logs')) {
 function product_gpt_clear_logs() {
     update_option('product_gpt_logs', []);

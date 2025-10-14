@@ -1,7 +1,7 @@
 <?php
-// === Funzioni gestione modelli dinamici GPT ===
+// === Dynamic GPT model management helpers ===
 
-// Richiede la API key salvata nelle opzioni
+// Requires the API key stored in the plugin options
 if (!function_exists('product_gpt_fetch_models')) {
 function product_gpt_fetch_models($api_key) {
     if (empty($api_key)) {
@@ -41,13 +41,13 @@ function product_gpt_update_model_cache() {
 }
 }
 
-// AJAX handler per aggiornamento modelli
+// AJAX handler that refreshes the available models
 add_action('wp_ajax_product_gpt_refresh_models', function() {
     if (!current_user_can('manage_options')) {
         wp_send_json_error(['message' => 'Non autorizzato']);
     }
     $api_key = get_option('product_gpt_api_key');
-    // AGGIUNGI QUESTO PER DEBUG
+    // Useful debug guard to ensure an API key exists
     if (!$api_key) {
         wp_send_json_error(['message' => 'API Key mancante nel backend!']);
     }

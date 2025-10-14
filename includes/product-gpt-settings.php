@@ -19,7 +19,9 @@ function product_gpt_get_default_profiles() {
     return [
         [
             'label'  => 'Orologi e Gioielli',
+            // Italian system prompt describing the assistant persona for jewelry and watches
             'system' => 'Sei un assistente per e-commerce di orologi e gioielli. Rispondi sempre in formato JSON.',
+            // Italian user prompt outlining how to extract structured WooCommerce data
             'prompt' => <<<'PROMPT'
 Estrai dalla seguente scheda tecnica TUTTI i dati caratteristici e restituiscili in JSON come campi attributo WooCommerce.
 Il JSON deve contenere i campi:
@@ -85,7 +87,7 @@ PROMPT,
 
 if (!function_exists('product_gpt_get_profiles')) {
 function product_gpt_get_profiles() {
-    // Usa un transient per evitare letture ripetute di grandi opzioni
+    // Use a transient to avoid repeatedly loading large options
     $profiles = get_transient('product_gpt_profiles_cache');
     if ($profiles !== false) {
         return $profiles;
@@ -102,7 +104,7 @@ function product_gpt_get_profiles() {
         update_option('product_gpt_profiles', $profiles);
     }
 
-    // Cache per 15 minuti
+    // Cache the profiles for 15 minutes
     set_transient('product_gpt_profiles_cache', array_values($profiles), 15 * MINUTE_IN_SECONDS);
 
     return array_values($profiles);
@@ -282,7 +284,7 @@ function product_gpt_render_settings_page() {
         update_option('product_gpt_profiles', $profiles);
         delete_transient('product_gpt_profiles_cache');
 
-        // Enforce palette di default nella versione gratuita
+        // Enforce the default palette in the free version
         $colors = product_gpt_get_brand_colors();
         update_option('product_gpt_color_scheme', 'default');
         update_option('product_gpt_bg_color', $colors['bg']);
@@ -343,7 +345,7 @@ function product_gpt_render_settings_page() {
             <?php wp_nonce_field('product_gpt_save_settings'); ?>
             <input type="hidden" name="product_gpt_action" value="save_settings" />
 
-            <!-- Profili AI -->
+            <!-- AI Profiles -->
             <h2 class="font-playfair text-2xl mb-2">Profili AI</h2>
             <div id="profiles-container" class="custom-section rounded-lg shadow p-6 border border-accent">
                 <?php
@@ -495,7 +497,7 @@ function product_gpt_render_settings_page() {
             alert('API Key copiata negli appunti!');
         });
 
-        // Gestione profili AI
+        // AI profile management
         let profileIdx = $('#profiles-list tr').length;
         const $addProfile = $('#add-profile');
 
@@ -548,14 +550,14 @@ function product_gpt_render_settings_page() {
             row.addClass('default');
         });
 
-        // BOTTONE AJAX GPT MODELS
+        // GPT model refresh button handler
         $('#refresh-gpt-models-btn').on('click', function(){
             $('#gpt-model-debug').html('⏳ Aggiornamento in corso...');
             $.post(ajaxurl, {
                 action: 'product_gpt_refresh_models'
             }, function(response){
                 if (response.success) {
-                    // Forza array anche se oggetto (robustezza massima)
+                    // Force an array even if the API returns an object for safety
                     if (response.data.models && typeof response.data.models === "object" && !Array.isArray(response.data.models)) {
                         response.data.models = Object.values(response.data.models);
                     }
@@ -565,7 +567,7 @@ function product_gpt_render_settings_page() {
                     );
 
                     let $sel = $('#gpt-model-select');
-                    let current = $sel.val(); // <-- salva il selezionato
+                    let current = $sel.val(); // Keep track of the previously selected value
                     let available = response.data.models.length ? response.data.models : ['gpt-3.5-turbo', 'gpt-4o'];
                     let optionsHtml = '';
                     available.forEach(function(m){
@@ -585,10 +587,10 @@ function product_gpt_render_settings_page() {
                         }
                     });
 
-                    // --- TIMER nascondi log RAW dopo 10 secondi ---
+                    // Hide the raw log block after 10 seconds
                     setTimeout(function(){
                         $('#gpt-model-debug').fadeOut(400, function(){
-                            $(this).empty().show(); // svuota e risetta display (per riutilizzo)
+                            $(this).empty().show(); // Reset the container so it can be reused
                         });
                     }, 10000);
                 } else {

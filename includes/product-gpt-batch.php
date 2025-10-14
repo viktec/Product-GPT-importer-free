@@ -48,8 +48,8 @@ function product_gpt_fetch_url_data($url, $max_tokens = 10000) {
     $body = wp_remote_retrieve_body($resp);
     $images = product_gpt_extract_images($body, $url);
     $body = wp_strip_all_tags($body);
-    // Limita la lunghezza per evitare errori di token
-    $chars = $max_tokens * 4; // stima 1 token ~ 4 caratteri
+    // Limit length to avoid token errors
+    $chars = $max_tokens * 4; // estimate: roughly 4 characters per token
     if (mb_strlen($body, '8bit') > $chars) {
         $body = mb_substr($body, 0, $chars);
     }

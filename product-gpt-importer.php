@@ -17,7 +17,7 @@ if (!defined('PRODUCT_GPT_IMPORTER_VERSION')) {
     define('PRODUCT_GPT_IMPORTER_VERSION', '1.30');
 }
 
-// Includi la settings page e il logger
+// Include the settings page and logging helpers
 
 require_once plugin_dir_path(__FILE__).'/includes/product-gpt-settings.php';
 require_once plugin_dir_path(__FILE__).'/includes/product-gpt-logger.php';
@@ -78,7 +78,7 @@ function product_gpt_register_request_attempt() {
 }
 }
 
-// Installazione/aggiornamento: assicura i profili di default
+// Installation/update: ensure default profiles are available
 if (!function_exists('product_gpt_install')) {
 function product_gpt_install() {
     if (get_option('product_gpt_profiles') === false) {
@@ -113,7 +113,7 @@ function product_gpt_ensure_profile_version() {
         }
     }
 
-    // Aggiorna i profili esistenti con i nuovi valori di default
+    // Update existing profiles with the latest default values
     foreach ($defaults as $def) {
         $slug = sanitize_title($def['label']);
         if (isset($merged[$slug])) {
@@ -141,7 +141,7 @@ add_filter('cron_schedules', function($schedules){
     return $schedules;
 });
 
-// === HELPER PER NORMALIZZAZIONE ATTRIBUTI ===
+// === ATTRIBUTE NORMALIZATION HELPERS ===
 if (!function_exists('normalize_attributes_flatten')) {
     function normalize_attributes_flatten($value) {
         if (is_array($value)) {
@@ -230,7 +230,7 @@ function product_gpt_download_image($url, $post_id = 0, $name = '') {
 }
 }
 
-// Admin menu
+// Admin menu setup
 add_action('admin_menu', function() {
     add_menu_page(
         'Il Mio Prodotto GPT',
@@ -242,17 +242,17 @@ add_action('admin_menu', function() {
         56
     );
 
-    // AGGIUNGI la pagina principale anche come primo submenu!
+    // Also add the main page as the first submenu item
     add_submenu_page(
         'product-gpt-importer',           // parent slug
         'GPT Prodotto',                   // page title
-        'Crea prodotto',                  // menu title (come vuoi)
+        'Crea prodotto',                  // menu title (customizable label)
         'edit_products',                  // capability
-        'product-gpt-importer',           // slug DEVE essere uguale a quello principale
+        'product-gpt-importer',           // slug must match the main page slug
         'product_gpt_page'                // callback
     );
 
-    // Pagina multiprodotto
+    // Multi-product page placeholder
     add_submenu_page(
         'product-gpt-importer',
         'Multiprodotto GPT',
@@ -262,7 +262,7 @@ add_action('admin_menu', function() {
         'product_gpt_render_batch_page'
     );
 
-    // Pagina anteprima batch
+    // Batch preview page placeholder
     add_submenu_page(
         'product-gpt-importer',
         'Anteprima Batch',
@@ -272,7 +272,7 @@ add_action('admin_menu', function() {
         'product_gpt_render_preview_page'
     );
 
-    // Poi la pagina delle impostazioni
+    // Settings page entry
     add_submenu_page(
         'product-gpt-importer',
         'Impostazioni GPT',
@@ -337,7 +337,7 @@ JS
     }
 });
 
-// Estrazione testo da DOCX
+// DOCX text extraction helper
 if (!function_exists('extract_text_from_docx')) {
     function extract_text_from_docx($filename) {
         $zip = new ZipArchive;
@@ -388,7 +388,9 @@ function product_gpt_page() {
             $profiles_default = function_exists('product_gpt_get_profiles') ? product_gpt_get_profiles() : [];
             $default_idx = function_exists('product_gpt_get_default_profile_index') ? product_gpt_get_default_profile_index($profiles_default) : 0;
             $default_profile = $profiles_default[$default_idx] ?? [];
+            // Italian user prompt template explaining how to extract WooCommerce data
             $default_prompt = $default_profile['prompt'] ?? 'Estrai dalla seguente descrizione e genera un prodotto WooCommerce completo con tutte le informazioni utili.';
+            // Italian system prompt that defines the assistant persona and output format
             $default_system_prompt = $default_profile['system'] ?? 'Sei un maestro profumiere che vende profumi di nicchia. Rispondi sempre in formato JSON.';
         ?>
         <form method="post" enctype="multipart/form-data" class="font-inter text-[#1A2A42]">
@@ -458,11 +460,11 @@ function product_gpt_page() {
             </div>
         </form>
         <?php
-        // INIZIO BLOCCO GENERAZIONE ANTEPRIMA E BOTTONI
+        // BEGIN PREVIEW GENERATION AND ACTION BUTTONS BLOCK
         if (isset($_POST['generate_product'])) {
             echo '<div class="notice notice-info"><p>🛠 Elaborazione in corso...</p></div>';
 
-            // 1) Lettura contenuto da file o URL
+            // 1) Read content from files or URLs
             $content = '';
             $urls = array_filter(array_map('trim', explode("\n", $_POST['product_urls'] ?? '')));
             $file = $_FILES['product_file'] ?? null;
@@ -496,7 +498,7 @@ function product_gpt_page() {
                 return;
             }
 
-            // 2) Costruzione del prompt (default o personalizzato)
+            // 2) Build the prompt (default or custom)
             $profiles = function_exists('product_gpt_get_profiles') ? product_gpt_get_profiles() : [];
             $profile_index = intval($_POST['profile_index'] ?? 0);
             $profile_prompt = $profiles[$profile_index]['prompt'] ?? ($default_profile['prompt'] ?? '');
@@ -521,7 +523,7 @@ function product_gpt_page() {
                 return;
             }
             
-            // Pulisci e decodifica il JSON
+            // Clean and decode the JSON payload
             if (preg_match('/\{(?:[^{}]|(?R))*\}/s', $response, $matches)) {
                 $response_clean = $matches[0];
             } else {
@@ -530,7 +532,7 @@ function product_gpt_page() {
             $data = json_decode($response_clean, true);
             if (isset($data['product'])) $data = $data['product'];
             
-            // Normalizza attributi ricorsivamente (helper)
+            // Normalize attributes recursively (helper)
             if (!empty($data['attributes']) && is_array($data['attributes'])) {
                 $data['attributes'] = normalize_attributes_deep($data['attributes']);
             }
@@ -541,7 +543,7 @@ function product_gpt_page() {
             }
 
 
-            // 3) Anteprima dati modificabili
+            // 3) Editable data preview table
             $featured = intval($_POST['featured_image_id'] ?? 0);
             $gallery  = array_filter(array_map('intval', explode(',', $_POST['gallery_image_ids'] ?? '')));
             $brand_preview = $data['brand'] ?? ($data['attributes']['Marca'] ?? '');
@@ -565,7 +567,7 @@ function product_gpt_page() {
             if ($gallery) foreach ($gallery as $id) echo wp_get_attachment_image($id, 'thumbnail', false, ['class'=>'m-1 inline-block']);
 
 
-            // 4) Form di conferma con due bottoni
+            // 4) Confirmation form with two actions
             $video_url = esc_url_raw($_POST['video_url'] ?? '');
             if (!empty($scraped_images)) {
                 echo '<div class="mt-4"><p class="font-semibold">Immagini trovate:</p>';
@@ -606,9 +608,9 @@ function product_gpt_page() {
             echo '<input type="button" name="cancel" class="px-4 py-2 ml-2 rounded-md border border-gray-300" value="Annulla" onclick="history.back();">';
             echo '</form>';
         }
-        // FINE BLOCCO GENERAZIONE ANTEPRIMA E BOTTONI
+        // END PREVIEW GENERATION AND ACTION BUTTONS BLOCK
 
-        // INIZIO BLOCCO CREAZIONE/ DUPLICAZIONE
+        // BEGIN CREATION/DUPLICATION BLOCK
         elseif (isset($_POST['confirm_create']) || isset($_POST['duplicate_product'])) {
             if (! wp_verify_nonce($_POST['_wpnonce'], 'product_gpt_confirm')) wp_die('Nonce non valido');
             list($data, $featured, $gallery, $video_url) = json_decode(stripslashes($_POST['confirm_data']), true);
@@ -634,7 +636,7 @@ function product_gpt_page() {
                 $i++; $sku = "{$base}-{$i}";
             }
             $data['sku'] = $sku;
-            // Normalizza attributi ricorsivamente (helper)
+            // Normalize attributes recursively (helper)
             if (!empty($data['attributes']) && is_array($data['attributes'])) {
                 $data['attributes'] = normalize_attributes_deep($data['attributes']);
             }
@@ -658,7 +660,7 @@ function product_gpt_page() {
             product_gpt_create_product($data, $featured, $gallery, $video_url);
             echo '<div class="notice notice-success"><p>✅ Prodotto creato con SKU: ' . esc_html($sku) . '</p></div>';
         }
-        // FINE BLOCCO CREAZIONE/ DUPLICAZIONE
+        // END CREATION/DUPLICATION BLOCK
         ?>
         <script>
 jQuery(function($){
