@@ -1,4 +1,8 @@
-# Product GPT Importer (Free)
+﻿# Product GPT Importer (Free)
+
+![WordPress Tested up to](https://img.shields.io/badge/WP-6.6-blue)
+![Requires PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-blue)
+![License: GPLv2+](https://img.shields.io/badge/License-GPLv2%2B-green)
 
 Product GPT Importer è un plugin WordPress pensato per creare prodotti WooCommerce partendo da documenti `.docx`, file `.pdf` o semplici URL. La generazione dei contenuti viene affidata a GPT: basta caricare la scheda tecnica (o indicare un link) e il plugin produce automaticamente titolo, descrizioni, attributi, immagini e tutti i campi essenziali del prodotto.
 
@@ -110,3 +114,4 @@ Per creare uno zip distribuibile:
 git archive --format=zip HEAD -o product-gpt-importer.zip
 ```
 Carica quindi `product-gpt-importer.zip` dal gestore plugin di WordPress.
+
