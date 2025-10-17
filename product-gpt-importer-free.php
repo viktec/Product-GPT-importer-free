@@ -2,13 +2,15 @@
 
 /**
  * Plugin Name: Product GPT Importer Free
+ * Plugin URI:  https://github.com/viktec/Product-GPT-importer-free
  * Description: Crea prodotti WooCommerce utilizzando ChatGPT partendo da file di scheda tecnica o da una pagina web esterna. Import base (versione gratuita). Funzioni avanzate nel Pro.
  * Version: 1.0.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: Vittorio Russo
  * License: GPLv2 or later
- * Text Domain: product-gpt-importer
+ * License URI:https://github.com/viktec/Product-GPT-importer-free?tab=GPL-3.0-1-ov-file
+ * Text Domain: product-gpt-importer-free-importer-free
  */
 
 if (!defined('ABSPATH')) exit;
@@ -19,11 +21,11 @@ if (!defined('PRODUCT_GPT_IMPORTER_VERSION')) {
 
 // Include the settings page and logging helpers
 
-require_once plugin_dir_path(__FILE__).'/includes/product-gpt-settings.php';
-require_once plugin_dir_path(__FILE__).'/includes/product-gpt-logger.php';
-require_once plugin_dir_path(__FILE__).'/includes/product-gpt-models.php';
-require_once plugin_dir_path(__FILE__).'/includes/product-gpt-batch.php';
-require_once plugin_dir_path(__FILE__).'/includes/product-gpt-preview.php';
+require_once plugin_dir_path(__FILE__).'/includes/product-gpt-importer-free-settings.php';
+require_once plugin_dir_path(__FILE__).'/includes/product-gpt-importer-free-logger.php';
+require_once plugin_dir_path(__FILE__).'/includes/product-gpt-importer-free-models.php';
+require_once plugin_dir_path(__FILE__).'/includes/product-gpt-importer-free-batch.php';
+require_once plugin_dir_path(__FILE__).'/includes/product-gpt-importer-free-preview.php';
 require_once plugin_dir_path(__FILE__).'/includes/pdf-extract.php';
 
 if (!function_exists('product_gpt_get_brand_colors')) {
@@ -236,7 +238,7 @@ add_action('admin_menu', function() {
         'Il Mio Prodotto GPT',
         'GPT Prodotto',
         'edit_products',
-        'product-gpt-importer',
+        'product-gpt-importer-free-importer',
         'product_gpt_page',
         'dashicons-products',
         56
@@ -244,41 +246,41 @@ add_action('admin_menu', function() {
 
     // Also add the main page as the first submenu item
     add_submenu_page(
-        'product-gpt-importer',           // parent slug
+        'product-gpt-importer-free-importer',           // parent slug
         'GPT Prodotto',                   // page title
         'Crea prodotto',                  // menu title (customizable label)
         'edit_products',                  // capability
-        'product-gpt-importer',           // slug must match the main page slug
+        'product-gpt-importer-free-importer',           // slug must match the main page slug
         'product_gpt_page'                // callback
     );
 
     // Multi-product page placeholder
     add_submenu_page(
-        'product-gpt-importer',
+        'product-gpt-importer-free-importer',
         'Multiprodotto GPT',
         'Multiprodotto',
         'edit_products',
-        'product-gpt-batch',
+        'product-gpt-importer-free-batch',
         'product_gpt_render_batch_page'
     );
 
     // Batch preview page placeholder
     add_submenu_page(
-        'product-gpt-importer',
+        'product-gpt-importer-free-importer',
         'Anteprima Batch',
         'Anteprima Batch',
         'edit_products',
-        'product-gpt-preview',
+        'product-gpt-importer-free-preview',
         'product_gpt_render_preview_page'
     );
 
     // Settings page entry
     add_submenu_page(
-        'product-gpt-importer',
+        'product-gpt-importer-free-importer',
         'Impostazioni GPT',
         'Impostazioni',
         'edit_products',
-        'product-gpt-settings',
+        'product-gpt-importer-free-settings',
         'product_gpt_render_settings_page'
     );
 });
@@ -287,20 +289,20 @@ add_action('admin_menu', function() {
 
 // Enqueue media uploader JS
 add_action('admin_enqueue_scripts', function($hook) {
-    if (strpos($hook, 'product-gpt-importer') === false && strpos($hook, 'product-gpt-settings') === false && strpos($hook, 'product-gpt-batch') === false && strpos($hook, 'product-gpt-preview') === false) {
+    if (strpos($hook, 'product-gpt-importer-free-importer') === false && strpos($hook, 'product-gpt-importer-free-settings') === false && strpos($hook, 'product-gpt-importer-free-batch') === false && strpos($hook, 'product-gpt-importer-free-preview') === false) {
         return;
     }
 
     wp_enqueue_style(
-        'product-gpt-fonts',
+        'product-gpt-importer-free-fonts',
         'https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap'
     );
-    wp_enqueue_script('product-gpt-tailwind', 'https://cdn.tailwindcss.com');
-    wp_add_inline_script('product-gpt-tailwind', "tailwind.config={theme:{extend:{fontFamily:{inter:['Inter','sans-serif'],playfair:['Playfair Display','serif']}}}}");
+    wp_enqueue_script('product-gpt-importer-free-tailwind', 'https://cdn.tailwindcss.com');
+    wp_add_inline_script('product-gpt-importer-free-tailwind', "tailwind.config={theme:{extend:{fontFamily:{inter:['Inter','sans-serif'],playfair:['Playfair Display','serif']}}}}");
     // admin.css was previously loaded here, but the file is now removed
     // because Tailwind provides all necessary styling
 
-    if ($hook === 'toplevel_page_product-gpt-importer') {
+    if ($hook === 'toplevel_page_product-gpt-importer-free-importer') {
         wp_enqueue_media();
         wp_add_inline_script('jquery-core', <<<JS
 jQuery(document).ready(function($){
@@ -360,7 +362,7 @@ function product_gpt_page() {
     $api_key = get_option('product_gpt_api_key');
     $model   = get_option('product_gpt_model', 'gpt-3.5-turbo');
     ?>
-    <div class="wrap" id="product-gpt-importer">
+    <div class="wrap" id="product-gpt-importer-free-importer">
         <?php
             $bg_color      = product_gpt_get_brand_color('bg');
             $btn_color     = product_gpt_get_brand_color('btn');
@@ -369,18 +371,18 @@ function product_gpt_page() {
             $accent_color  = product_gpt_get_brand_color('accent');
         ?>
         <style>
-            #product-gpt-importer .custom-section{background-color:<?php echo esc_attr($bg_color); ?>;border-color:<?php echo esc_attr($accent_color); ?>}
-            #product-gpt-importer .accent{color:<?php echo esc_attr($accent_color); ?>}
-            #product-gpt-importer .border-accent{border-color:<?php echo esc_attr($accent_color); ?>}
-            #product-gpt-importer .btn-primary{background-color:<?php echo esc_attr($btn_color); ?>}
-            #product-gpt-importer .btn-primary:hover{background-color:<?php echo esc_attr($btn_hover); ?>}
-            #product-gpt-importer .btn-primary:active{background-color:<?php echo esc_attr($btn_active); ?>}
+            #product-gpt-importer-free-importer .custom-section{background-color:<?php echo esc_attr($bg_color); ?>;border-color:<?php echo esc_attr($accent_color); ?>}
+            #product-gpt-importer-free-importer .accent{color:<?php echo esc_attr($accent_color); ?>}
+            #product-gpt-importer-free-importer .border-accent{border-color:<?php echo esc_attr($accent_color); ?>}
+            #product-gpt-importer-free-importer .btn-primary{background-color:<?php echo esc_attr($btn_color); ?>}
+            #product-gpt-importer-free-importer .btn-primary:hover{background-color:<?php echo esc_attr($btn_hover); ?>}
+            #product-gpt-importer-free-importer .btn-primary:active{background-color:<?php echo esc_attr($btn_active); ?>}
         </style>
         <h1 class="font-playfair text-3xl mb-6">Product GPT Importer</h1>
         
         <?php if (!$api_key): ?>
             <div class="notice notice-warning">
-                <p><strong>⚠️ API Key mancante! Configurala nelle <a href="<?php echo admin_url('admin.php?page=product-gpt-settings'); ?>">impostazioni del plugin</a>.</strong></p>
+                <p><strong>⚠️ API Key mancante! Configurala nelle <a href="<?php echo admin_url('admin.php?page=product-gpt-importer-free-settings'); ?>">impostazioni del plugin</a>.</strong></p>
             </div>
         <?php endif; ?>
         <?php
